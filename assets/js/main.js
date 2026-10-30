@@ -20,12 +20,12 @@
       link.removeAttribute("aria-disabled");
       link.removeAttribute("aria-describedby");
       link.classList.remove("pending");
-      link.querySelector(".link-status").remove();
+      link.querySelector(".link-status")?.remove();
       linked += 1;
     } catch { /* Missing or invalid release URLs retain their pending state. */ }
   });
   if (linked === 2) document.getElementById("resource-status").hidden = true;
-  else if (linked === 1) document.getElementById("resource-status").textContent = "The remaining resource link will be added upon release.";
+  else if (linked === 1) document.getElementById("resource-status").textContent = document.getElementById("paper-link").hasAttribute("href") ? "The code link will be added upon release." : "The arXiv PDF link will be added upon release.";
 
   /* Matched states, error states, and trajectory depth: manual figure carousel. */
   const carousel = document.querySelector(".scatter-carousel");
