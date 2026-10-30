@@ -198,12 +198,12 @@ p,figcaption{ text-wrap:pretty; }
 /* Full-width prose and compact, vector-backed benchmark comparisons. */
 .abstract-copy,.part-heading,.part-lede,.budget-takeaway,.process-takeaway{max-width:none}
 .part-lede{font-size:18px;line-height:1.8}
-h1,h2,.mechanism-part-title,.part-heading h3{text-transform:uppercase}
-.hero h1{font-size:clamp(25px,2.75vw,39px)}
+h1,h2,.mechanism-part-title,.part-heading h3{text-transform:none}
+.hero h1{font-size:clamp(28px,3.25vw,44px)}
 .mechanism-figures{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:28px 0 20px;align-items:start}
 .mechanism-figures .mechanism-figure{min-width:0;max-width:none;margin:0}
 .mechanism-figures .figure-link{background:white;border:1px solid var(--line);border-radius:10px;padding:10px}
 .mechanism-figures img{border:0;border-radius:0;padding:0;width:100%}
 .mechanism-figures figcaption{font-size:13px;line-height:1.7}
 @media(max-width:700px){.mechanism-figures{grid-template-columns:1fr;gap:24px}}
-@media(max-width:640px){.hero h1{font-size:29px}.part-lede{font-size:16px}.mechanism-figures .figure-link{padding:8px}}
+@media(max-width:640px){.hero h1{font-size:32px}.part-lede{font-size:16px}.mechanism-figures .figure-link{padding:8px}}
