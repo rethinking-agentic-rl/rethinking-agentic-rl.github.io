@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="What does multi-turn agentic RL really improve? Trajectory-level gains depend on interaction budgets; advantages concentrate in error recovery and long-horizon resilience. Explore Pass@K, Pass@T, and BudgetMix RL." name="description"/>
+<meta content="#f8f7f3" name="theme-color"/>
+<title>What Does Multi-Turn Reinforcement Learning Really Improve in LLM Agents?</title>
+<link href="assets/favicon.svg" rel="icon" type="image/svg+xml"/>
+<link href="assets/css/style.css?v=7" rel="stylesheet"/>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="hero" id="top">
+<div class="wrap">
+<p class="eyebrow"><span class="status-dot"></span> Rethinking Agentic RL <span class="eyebrow-divider">/</span> Research overview</p>
+<h1><span class="hero-title-line">What Does Multi-Turn Reinforcement Learning</span><span class="hero-title-line"><em>Really</em> Improve in LLM Agents?</span></h1>
+<p class="authors">Anonymous authors</p>
+<p class="hero-summary">Budget-dependent gains; stronger <strong>error recovery</strong> and <strong>long-horizon resilience</strong>.</p>
+<div aria-label="Paper and code" class="resource-links">
+<a aria-describedby="resource-status" aria-disabled="true" class="button primary pending" id="paper-link" role="link"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M14 3H5v18h14V8zM14 3v6h5M8 13h8M8 17h6"></path></svg> arXiv PDF <span class="link-status">Coming soon</span></a>
+<a aria-describedby="resource-status" aria-disabled="true" class="button pending" id="code-link" role="link"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-14-2 18"></path></svg> GitHub <span class="link-status">Coming soon</span></a>
+</div>
+<p class="resource-status" id="resource-status">Paper and code links will be added upon release.</p>
+<a class="scroll-link" href="#overview">Explore the findings <span aria-hidden="true">↓</span></a>
+</div>
+</header>
+<main id="main"><section class="section overview-section" id="overview"><div class="wrap"><div class="overview-panel"><div class="overview-heading"><p class="eyebrow">Abstract &amp; overview</p><h2>Overview of our findings.</h2></div><div class="abstract-copy"><p>While <span class="paper-term">multi-turn</span> agentic reinforcement learning (RL) excels on <span class="paper-term">long-horizon</span> tasks, its performance gains
+      remain <em>highly sensitive to interaction constraints</em>. Evaluating across sampling breadth
+      <b> K </b> and interaction depth <b> T </b> via  <b> Pass@(K,T) </b>, we
+      show that <span class="paper-term">trajectory-level</span> RL advantages <em>depend on sufficient turn budgets, diminishing significantly
+      when budgets tighten</em>. Besides, agentic RL <em>does not uniformly elevate <span class="paper-term">single-step</span> decision
+      quality</em>; rather, its strength concentrates in <em>error recovery and <span class="paper-term">long-horizon</span> resilience</em>. To
+      mitigate the deployment risks caused by this budget dependence, we provide a preliminary discussion on the
+      benefits and limitations of process supervision signals and introduce <em><span class="paper-term">BudgetMix RL</span></em> as an
+      alternative that varies interaction budgets during training. Experiments demonstrate that <span class="paper-term">BudgetMix RL</span>
+      achieves <em>robust performance across diverse execution settings</em>.</p></div><figure class="overview-figure"><a aria-label="Open full-size figure: Paper overview: error recovery, long-horizon resilience, and interaction-budget dependence" class="figure-link" href="assets/figures/agent-rl-intro-figure_v6.png" rel="noopener noreferrer" target="_blank"><img alt="Paper overview: error recovery, long-horizon resilience, and interaction-budget dependence" fetchpriority="high" height="443" loading="eager" src="assets/figures/agent-rl-intro-figure_v6.png" width="1842"/></a><figcaption><span class="figure-number">Figure 1</span> Overview of our findings. Multi-turn agentic RL mainly strengthens error recovery and <span class="paper-term">long-horizon</span> resilience; <span class="paper-term">trajectory-level</span> gains depend on a sufficient interaction budget.</figcaption></figure></div><div aria-label="Explore the paper" class="module-grid"><a class="module-card" href="#f1"><span class="module-number">01A</span><span class="module-tag">Pass@K</span><h3>Beyond the empirical capability boundary</h3><p>Unlike single-turn RL, multi-turn agentic RL can surpass the base model’s empirical Pass@K capability boundary.</p><span aria-hidden="true" class="module-arrow">↗</span></a><a class="module-card" href="#f2"><span class="module-number">01B</span><span class="module-tag">Pass@T</span><h3>Gains depend on the interaction budget</h3><p>The RL advantage can diminish or reverse when the interaction budget tightens.</p><span aria-hidden="true" class="module-arrow">↗</span></a><a class="module-card" href="#step-quality"><span class="module-number">02</span><span class="module-tag">Step-level action quality</span><h3>No consistent <span class="paper-term">single-step</span> improvement</h3><p>Advantages may concentrate in error recovery and <span class="paper-term">long-horizon</span> resilience.</p><span aria-hidden="true" class="module-arrow">↗</span></a><a class="module-card" href="#mechanism"><span class="module-number">03</span><span class="module-tag">Mechanism analysis</span><h3>Locally plausible actions, a policy shift</h3><p>Likelihood analysis and training dynamics examine the sources of <span class="paper-term">trajectory-level</span> gains.</p><span aria-hidden="true" class="module-arrow">↗</span></a><a class="module-card" href="#discussion"><span class="module-number">04</span><span class="module-tag">Preliminary discussion</span><h3>Towards more stable agentic RL</h3><p>A preliminary discussion of process supervision signals and <span class="paper-term">BudgetMix RL</span> for more robust agent performance.</p><span aria-hidden="true" class="module-arrow">↗</span></a></div></div></section><nav aria-label="Section navigation" class="nav">
+<div class="wrap nav-inner">
+<a class="nav-brand" href="#top">Rethinking <span>Agentic RL</span></a>
+<div class="nav-links"><a href="#findings">Pass@K &amp; Pass@T</a><a href="#step-quality">Step-level quality</a><a href="#mechanism">Mechanism</a><a href="#discussion">Preliminary discussion</a></div>
+</div>
+</nav>
+<section class="section results-section" id="findings">
+<div class="wrap">
+<div class="section-heading"><h2 class="chapter-title"><span class="chapter-number">01 /</span> Trajectory-level performance</h2><p>Pass@(K, T) evaluates the probability that at least one of <strong>K</strong> sampled trajectories succeeds within <strong>T</strong> interaction turns.</p></div>
+<div class="results-board">
+<div class="result-controls interactive-only" hidden="">
+<div aria-label="Benchmark" class="task-buttons" role="group">
+<button aria-pressed="true" data-task="1" type="button">DeepCoder-MT</button><button aria-pressed="false" data-task="3" type="button">FrozenLake</button><button aria-pressed="false" data-task="0" type="button">BFCL v3</button><button aria-pressed="false" data-task="2" type="button">InterCode-SQL</button>
+</div>
+<label class="model-label" for="model-select">Model <select id="model-select"><option value="0">Qwen3-4B</option><option value="1">Qwen3-8B</option></select></label>
+</div>
+<div class="chart-meta"><p aria-live="polite" id="chart-context">Four benchmarks · Qwen3-4B &amp; Qwen3-8B · GRPO</p><div aria-label="Curve legend" class="legend"><span class="base-key">▲ Base</span><span class="rl-key">▼ GRPO</span></div></div>
+<div class="chart-grid">
+<figure class="chart-card" id="f1">
+<div class="chart-head"><span class="metric-label">Pass@K</span><span>Sampling breadth</span></div>
+<h3 id="chart-k-title">Multi-turn RL can surpass the empirical capability boundary</h3>
+<div class="chart-viewport" id="chart-k"><img alt="Paper Figure 2: Pass@K across four benchmarks and two model sizes. GRPO remains above Base as K increases." height="929" src="assets/figures/pass_at_k_grid_4tasks_grpo__red_gray_shaded.png" width="2075"/></div>
+<p class="axis-label">Number of sampled trajectories K</p>
+<figcaption id="chart-k-description">Unlike single-turn RL, multi-turn agentic RL can push trajectory-level performance beyond the empirical Pass@K capability boundary of the base model.</figcaption>
+</figure>
+<figure class="chart-card" id="f2">
+<div class="chart-head"><span class="metric-label">Pass@T</span><span>Interaction depth · K = 8</span></div>
+<h3 id="chart-t-title">The RL advantage depends on sufficient interaction turns</h3>
+<div class="chart-viewport" id="chart-t"><img alt="Paper Figure 3: Pass@T at K=8. The GRPO advantage diminishes or reverses under tight interaction budgets." height="922" src="assets/figures/pass_at_t_grid_4tasks__red_gray_shaded.png" width="2070"/></div>
+<p class="axis-label">Maximum interaction turns T</p>
+<figcaption id="chart-t-description">The advantage becomes more pronounced with sufficient interaction turns, but can diminish or even reverse under tight budgets.</figcaption>
+</figure>
+</div>
+<div class="playback interactive-only" hidden=""><button class="small-button" id="replay" type="button"><span aria-hidden="true">↻</span> Replay curves</button><button class="small-button" disabled="" id="pause" type="button">Pause</button><label class="scrub-label" for="curve-progress">Reveal <input aria-label="Curve reveal progress" id="curve-progress" max="100" min="0" step="1" type="range" value="100"/><output for="curve-progress" id="progress-value">100%</output></label></div>
+<p class="source-note">Figures 2 &amp; 3 · Original paper curves. Shaded regions indicate the performance gap.</p>
+</div>
+<details class="evidence"><summary>View all benchmarks and evaluation details <span>§§2.2–3.2</span></summary><div class="details-body"><p>GRPO is the primary RL algorithm. Pass@K sweeps sampling breadth; Pass@T fixes K = 8 and varies the maximum interaction turns. Under tight budgets, substantial headroom can remain below the structural performance upper bound (Appendix B.3).</p><figure><a aria-label="Open full-size figure: Complete Figure 2: Pass@K grid for Qwen3-4B and Qwen3-8B" class="figure-link" href="assets/figures/pass_at_k_grid_4tasks_grpo__red_gray_shaded.png" rel="noopener noreferrer" target="_blank"><img alt="Complete Figure 2: Pass@K grid for Qwen3-4B and Qwen3-8B" height="929" loading="lazy" src="assets/figures/pass_at_k_grid_4tasks_grpo__red_gray_shaded.png" width="2075"/></a><figcaption>Figure 2. Pass@K across sampling breadth.</figcaption></figure><figure><a aria-label="Open full-size figure: Complete Figure 3: Pass@T grid at fixed K=8" class="figure-link" href="assets/figures/pass_at_t_grid_4tasks__red_gray_shaded.png" rel="noopener noreferrer" target="_blank"><img alt="Complete Figure 3: Pass@T grid at fixed K=8" height="922" loading="lazy" src="assets/figures/pass_at_t_grid_4tasks__red_gray_shaded.png" width="2070"/></a><figcaption>Figure 3. Pass@T at fixed K = 8.</figcaption></figure></div></details>
+</div>
+</section>
+<section class="section tinted" id="step-quality">
+<div class="wrap">
+<div class="section-heading"><h2 class="chapter-title"><span class="chapter-number">02 /</span> Step-level action quality</h2><p class="chapter-thesis">No consistent improvement in single-step action quality.</p><p>Multi-turn agentic RL does not consistently improve single-step action quality. Its advantages may instead concentrate in error recovery and long-horizon resilience.</p></div>
+<div class="quality-grid">
+<article class="quality-card" data-scatter-card="0"><span class="card-index">A / Matched states</span><h3>No consistent <span class="paper-term">single-step</span> improvement</h3><p>States where RL achieves better action quality:</p><div class="stat-pair"><div><strong>46.8<span>%</span></strong><span>DeepCoder-MT</span></div><div><strong>42.8<span>%</span></strong><span>FrozenLake</span></div></div></article>
+<article class="quality-card recovery" data-scatter-card="1"><span class="card-index">B / Error states</span><h3>Stronger action quality after errors</h3><p>Error states where RL selects the superior action:</p><div class="stat-pair"><div><strong>67.3<span>%</span></strong><span>DeepCoder-MT</span></div><div><strong>65.7<span>%</span></strong><span>FrozenLake</span></div></div></article>
+<article class="quality-card depth-card" data-scatter-card="2"><span class="card-index">C / Trajectory depth</span><h3>Action-quality advantages emerge later</h3><p>RL shows little advantage early in execution. Its step-level advantage becomes more pronounced later in long-horizon trajectories.</p><p class="depth-highlight">Later interaction reveals the RL advantage.</p></article></div><div aria-label="Action quality on matched states, error states, and across trajectory depth" aria-roledescription="carousel" class="scatter-carousel" role="region" tabindex="0"><div class="scatter-heading"><div><span class="card-index">Step-level action quality · Figures 4–6</span><h3 id="scatter-title">No consistent improvement in single-step action quality</h3></div><span aria-live="polite" class="scatter-counter" id="scatter-counter">1 / 3</span></div><div class="scatter-stage"><figure aria-label="1 of 3: No consistent improvement in single-step action quality" aria-roledescription="slide" class="scatter-slide" data-slide-title="No consistent improvement in single-step action quality" id="scatter-slide-0" role="group"><a aria-label="Open full-size figure: Figure 4: action quality scatter plots on matched states" class="figure-link" href="assets/figures/matched_state_combined__orig_colors.png" rel="noopener noreferrer" target="_blank"><img alt="Figure 4: action quality scatter plots on matched states" height="441" loading="lazy" src="assets/figures/matched_state_combined__orig_colors.png" width="1413"/></a><figcaption>Figure 4. Step-level action quality on matched states.</figcaption></figure><figure aria-label="2 of 3: Better action quality on error states" aria-roledescription="slide" class="scatter-slide" data-slide-title="Better action quality on error states" id="scatter-slide-1" role="group"><a aria-label="Open full-size figure: Figure 5: action quality scatter plots on error states" class="figure-link" href="assets/figures/error_state_combined__orig_colors.png" rel="noopener noreferrer" target="_blank"><img alt="Figure 5: action quality scatter plots on error states" height="441" loading="lazy" src="assets/figures/error_state_combined__orig_colors.png" width="1413"/></a><figcaption>Figure 5. Step-level action quality on error states.</figcaption></figure><figure aria-label="3 of 3: Action-quality advantages emerge later in trajectories" aria-roledescription="slide" class="scatter-slide" data-slide-title="Action-quality advantages emerge later in trajectories" id="scatter-slide-2" role="group"><a aria-label="Open full-size figure: Figure 6: RL step-level action quality improves relative to Base later in trajectories" class="figure-link" href="assets/figures/quality_by_turn_combined__orig_colors.png" rel="noopener noreferrer" target="_blank"><img alt="Figure 6: RL step-level action quality improves relative to Base later in trajectories" height="448" loading="lazy" src="assets/figures/quality_by_turn_combined__orig_colors.png" width="1430"/></a><figcaption><span class="figure-number">Figure 6</span> The RL advantage emerges later in trajectories. Shading denotes 95% confidence intervals.</figcaption></figure></div><div class="scatter-controls" hidden=""><button aria-label="Previous action-quality figure" class="carousel-arrow" id="scatter-prev" type="button">←</button><div aria-label="Select an action-quality finding" class="scatter-dots" role="group"><button aria-pressed="true" data-scatter="0" type="button">Matched states</button><button aria-pressed="false" data-scatter="1" type="button">Error states</button><button aria-pressed="false" data-scatter="2" type="button">Trajectory depth</button></div><button aria-label="Next action-quality figure" class="carousel-arrow" id="scatter-next" type="button">→</button></div></div>
+<p class="source-note">Qwen3-4B · GRPO · Figures 4–6. Percentages compare action quality on matched states and error states.</p>
+
+<details class="evidence"><summary>How we evaluate matched states and error recovery <span>§3.3 · Figures 4 &amp; 5</span></summary><div class="details-body"><p>We independently sample 16 actions from each policy at the same state. FrozenLake uses exact Q* values from finite-horizon dynamic programming (γ = 0.95); <span class="paper-term">DeepCoder-MT</span> uses unit-test pass rates. Intermediate states are sampled equally from base and RL trajectories. Error states are constructed by injecting an incorrect action at the preceding step.</p><p>Continuing from identical error states, terminal success is higher for RL: <strong>51.3% vs. 38.6%</strong> on FrozenLake and <strong>38.5% vs. 22.9%</strong> on <span class="paper-term">DeepCoder-MT</span>.</p></div></details>
+</div>
+</section>
+<section class="section" id="mechanism">
+<div class="wrap"><div class="section-heading"><h2 class="chapter-title"><span class="chapter-number">03 /</span> Mechanisms behind the observed behaviors</h2><p>Log-likelihood analysis and training dynamics examine the sources of trajectory-level gains.</p></div><article class="mechanism-part" id="log-likelihood"><h3 class="mechanism-part-title"><span>3.1</span> Log-likelihood analysis</h3><p>RL-generated actions remain locally plausible under the base policy, yet complete RL trajectories receive substantially higher likelihood under the RL policy. This suggests that multi-turn RL may improve how reliably the model composes locally plausible actions into long-horizon trajectories.</p><p>Keeping histories fixed, <strong>ActionNLL</strong> measures action surprisal under the base policy. The cumulative <strong>log-likelihood ratio (LLR)</strong> compares the RL and base policies over complete responses, including reasoning and action tokens.</p><figure class="paper-figure mechanism-figure"><a aria-label="Open full-size figure: Figure 7: log-likelihood analysis on Terminal-Bench" class="figure-link" href="assets/figures/figure_07_terminal_local_global_separated_callouts_action_total_nll.png" rel="noopener noreferrer" target="_blank"><img alt="Figure 7: log-likelihood analysis on Terminal-Bench" height="701" loading="lazy" src="assets/figures/figure_07_terminal_local_global_separated_callouts_action_total_nll.png" width="1247"/></a><figcaption><span class="figure-number">Figure 7 · Terminal-Bench</span> Local action surprisal overlaps, while trajectory preference compounds. Bands indicate 95% confidence.</figcaption></figure><details class="evidence"><summary>Additional log-likelihood analysis on BFCL <span>Appendix E.2 · Figure 23</span></summary><div class="details-body"><p>BFCL shows a consistent pattern: similar action likelihoods under the base policy, alongside a substantial policy shift over complete trajectories. Length-matched comparisons further examine the influence of output length.</p><figure class="paper-figure mechanism-figure"><a aria-label="Open full-size figure: Figure 23: BFCL log-likelihood analysis and length-matched LLR controls" class="figure-link" href="assets/figures/figure_08_bfcl_with_length_matched_llr.png" rel="noopener noreferrer" target="_blank"><img alt="Figure 23: BFCL log-likelihood analysis and length-matched LLR controls" height="697" loading="lazy" src="assets/figures/figure_08_bfcl_with_length_matched_llr.png" width="2002"/></a><figcaption><span class="figure-number">Figure 23</span> (a) Additional log-likelihood analysis on BFCL. (b) Cumulative LLR after length matching; error bars indicate 95% confidence intervals.</figcaption></figure></div></details></article><article class="mechanism-part" id="training-dynamics"><h3 class="mechanism-part-title"><span>3.2</span> Training dynamics</h3><p>As standard multi-turn RL training proceeds, the trajectory-level reward <strong>R<sub>multi</sub></strong> keeps rising, while the step-level reward <strong>R<sub>single</sub></strong> does not improve and can gradually decline. Trajectory-level gains can develop alongside declining step-level action quality.</p><p>On DeepCoder-MT, R<sub>multi</sub> increases by <strong>0.331</strong> while R<sub>single</sub> drops by <strong>0.097</strong>.</p><figure class="paper-figure mechanism-figure"><a aria-label="Open full-size figure: Figure 8: training dynamics on DeepCoder-MT" class="figure-link" href="assets/figures/training_curves_deepcode__style.png" rel="noopener noreferrer" target="_blank"><img alt="Figure 8: training dynamics on DeepCoder-MT" height="652" loading="lazy" src="assets/figures/training_curves_deepcode__style.png" width="1040"/></a><figcaption><span class="figure-number">Figure 8 · DeepCoder-MT</span> Trajectory-level reward and step-level reward during full-budget RL and BudgetMix training.</figcaption></figure><details class="evidence"><summary>Additional training dynamics on FrozenLake <span>Appendix E.3 · Figure 24</span></summary><div class="details-body"><p>FrozenLake exhibits the same pattern under standard RL: trajectory-level reward increases while single-step action quality tends to decline. With BudgetMix RL, step-level quality remains stable or improves slightly.</p><figure class="paper-figure mechanism-figure"><a aria-label="Open full-size figure: Figure 24: training dynamics on FrozenLake" class="figure-link" href="assets/figures/training_curves_frozenlake__style.png" rel="noopener noreferrer" target="_blank"><img alt="Figure 24: training dynamics on FrozenLake" height="652" loading="lazy" src="assets/figures/training_curves_frozenlake__style.png" width="1040"/></a><figcaption><span class="figure-number">Figure 24 · FrozenLake</span> Training dynamics of trajectory-level reward R<sub>multi</sub> and step-level reward R<sub>single</sub>.</figcaption></figure></div></details></article></div>
+</section>
+<section class="section budget-section" id="discussion">
+<div class="wrap">
+<div class="section-heading"><h2 class="chapter-title"><span class="chapter-number">04 /</span> Towards more stable agentic RL</h2><span class="discussion-label">A preliminary discussion</span><p>We discuss potential mitigation strategies to preserve <span class="paper-term">long-horizon</span> execution and <span class="paper-term">trajectory-level</span> gains while reducing reliance on extra interaction budgets: <strong>process supervision signals</strong> and <strong><span class="paper-term">BudgetMix RL</span></strong>.</p></div><article class="discussion-part" id="process-supervision"><div class="part-heading"><span class="part-number">I</span><div><p class="eyebrow">Process supervision signals · §5.1</p><h3>High-quality process signals can partly mitigate this risk</h3></div></div><p class="part-lede">Finer-grained signals can improve per-step action quality through process rewards or credit assignment. Their benefits depend on the quality of the available supervision.</p><div class="process-grid"><div class="process-card"><span class="card-index">Benefits / FrozenLake</span><h4>Accurate process supervision helps</h4><p>Oracle Q-value process rewards and GiGPO stabilize performance across interaction budgets, especially under tight budgets.</p></div><div class="process-card"><span class="card-index">Limitations / BFCL</span><h4>Precise signals are rarely accessible</h4><p>Without an exact <span class="paper-term">step-level</span> oracle, GiGPO and PPO fail to improve performance under constrained budgets and perform similarly to GRPO.</p></div></div><figure class="paper-figure process-figure"><a aria-label="Open full-size figure: Figure 9: process supervision helps on FrozenLake; limited gains under tight budgets on BFCL" class="figure-link" href="assets/figures/prm_ablation_frozenlake_bfcl__annotated.png" rel="noopener noreferrer" target="_blank"><img alt="Figure 9: process supervision helps on FrozenLake; limited gains under tight budgets on BFCL" height="546" loading="lazy" src="assets/figures/prm_ablation_frozenlake_bfcl__annotated.png" width="1941"/></a><figcaption>Figure 9. Effect of process supervision signals on Pass@T.</figcaption></figure><p class="process-takeaway">High-quality process rewards can alleviate budget reliance, but acquiring such supervision remains impractical for most real-world applications.</p></article><article class="discussion-part" id="budgetmix"><div class="part-heading"><span class="part-number">II</span><div><p class="eyebrow"><span class="paper-term">BudgetMix RL</span> · §5.2</p><h3>Optimizing RL across interaction budgets</h3></div></div><p class="part-lede"><span class="paper-term">BudgetMix RL</span> keeps the same reward mechanism and varies the interaction budget across training trajectories. It can be combined with GRPO, PPO, and GiGPO.</p><div class="budget-method"><div><span class="card-index">Training · §5.2</span><h3>One budget per task group</h3><p>Construct candidate budgets at 10% intervals, round up to whole turns, remove duplicates, and sample uniformly. All rollouts in a task group share the same budget.</p></div><div aria-label="Candidate budget ratios at 10 percent intervals" class="budget-visual"><div aria-hidden="true" class="budget-bars"><span style="--budget:1" title="10%"></span><span style="--budget:2" title="20%"></span><span style="--budget:3" title="30%"></span><span style="--budget:4" title="40%"></span><span style="--budget:5" title="50%"></span><span style="--budget:6" title="60%"></span><span style="--budget:7" title="70%"></span><span style="--budget:8" title="80%"></span><span style="--budget:9" title="90%"></span><span style="--budget:10" title="100%"></span></div><p>10% increments → T<sub>max</sub></p></div></div><p class="gain-heading">Average improvement over <span class="paper-term">full-budget</span> RL</p><div class="gain-grid"><div><strong>+7.5<span>pp</span></strong><p>at 25% of T<sub>max</sub></p></div><div><strong>+5.3<span>pp</span></strong><p>at 50% of T<sub>max</sub></p></div><div><strong>+4.0<span>pp</span></strong><p>at 75% of T<sub>max</sub></p></div></div><p class="source-note">§5.4 · Reported averages across four tasks, two model sizes, and three RL algorithms.</p><p class="budget-takeaway">BudgetMix largely mitigates local decision-quality degradation while <strong>preserving <span class="paper-term">long-horizon</span> gains</strong>.</p><details class="evidence"><summary>Full results across tasks, budgets, and algorithms <span>Table 1</span></summary><div class="details-body"><p>Pass@T evaluation results (Pass@8, %). Bold and underlined values mark the best and second-best results within each model size, task, and budget. Avg. gain compares BudgetMix with <span class="paper-term">full-budget</span> RL across GRPO, GiGPO, and PPO.</p><div aria-label="BudgetMix results from Table 1; scroll horizontally" class="table-scroll" role="region" tabindex="0"><table class="paper-table" id="budgetmix-table">
+<thead>
+<tr>
+<th class="corner" scope="col"></th>
+<th class="task-group" colspan="4" scope="colgroup"><b>FrozenLake</b> (T<sub>max</sub>=70)</th>
+<th class="task-group" colspan="4" scope="colgroup"><b>DeepCoder-MT</b> (T<sub>max</sub>=10)</th>
+<th class="task-group" colspan="4" scope="colgroup"><b>BFCL-v3</b> (T<sub>max</sub>=24)</th>
+<th class="task-group" colspan="4" scope="colgroup"><b>InterCode-SQL</b> (T<sub>max</sub>=10)</th>
+<th class="corner" scope="col"></th>
+</tr><tr>
+<th scope="col"><b>Method</b></th>
+<th scope="col">25%</th>
+<th scope="col">50%</th>
+<th scope="col">75%</th>
+<th scope="col">100%</th>
+<th scope="col">25%</th>
+<th scope="col">50%</th>
+<th scope="col">75%</th>
+<th scope="col">100%</th>
+<th scope="col">25%</th>
+<th scope="col">50%</th>
+<th scope="col">75%</th>
+<th scope="col">100%</th>
+<th scope="col">25%</th>
+<th scope="col">50%</th>
+<th scope="col">75%</th>
+<th scope="col">100%</th>
+<th scope="col"><b>Avg.</b></th>
+</tr></thead><tbody>
+<tr class="model-group"><td colspan="18"><b>Qwen3-4B</b></td></tr>
+<tr class="row-base">
+<th scope="row">Base</th>
+<td>30.3</td>
+<td>49.1</td>
+<td>58.7</td>
+<td>61.6</td>
+<td>34.0</td>
+<td>43.5</td>
+<td>47.3</td>
+<td>48.3</td>
+<td>3.0</td>
+<td>15.6</td>
+<td>21.2</td>
+<td>26.4</td>
+<td>23.1</td>
+<td>28.8</td>
+<td>31.8</td>
+<td>33.5</td>
+<td>34.8</td>
+</tr>
+<tr class="">
+<th scope="row">GRPO Full</th>
+<td>28.7</td>
+<td>55.1</td>
+<td>68.1</td>
+<td>72.4</td>
+<td>29.2</td>
+<td>48.0</td>
+<td>56.0</td>
+<td>59.0</td>
+<td>2.5</td>
+<td>17.6</td>
+<td>27.0</td>
+<td>30.2</td>
+<td>23.1</td>
+<td>32.2</td>
+<td>37.4</td>
+<td><u>46.0</u></td>
+<td>39.5</td>
+</tr>
+<tr class="row-mix">
+<th scope="row">GRPO BudgetMix</th>
+<td>37.6</td>
+<td>61.1</td>
+<td>72.0</td>
+<td>73.5</td>
+<td><b>38.1</b></td>
+<td><b>54.3</b></td>
+<td><b>60.5</b></td>
+<td><b>61.2</b></td>
+<td><u>8.5</u></td>
+<td>23.0</td>
+<td>30.5</td>
+<td>30.8</td>
+<td><b>28.9</b></td>
+<td><b>37.7</b></td>
+<td><b>42.9</b></td>
+<td><b>47.5</b></td>
+<td>44.3</td>
+</tr>
+<tr class="">
+<th scope="row">GiGPO Full</th>
+<td>38.4</td>
+<td>58.4</td>
+<td>70.4</td>
+<td>76.5</td>
+<td>28.8</td>
+<td>48.3</td>
+<td>55.6</td>
+<td>58.8</td>
+<td>3.4</td>
+<td>18.4</td>
+<td>28.8</td>
+<td>31.3</td>
+<td>23.4</td>
+<td>31.5</td>
+<td>37.5</td>
+<td>45.0</td>
+<td>40.9</td>
+</tr>
+<tr class="row-mix">
+<th scope="row">GiGPO BudgetMix</th>
+<td><b>46.3</b></td>
+<td><b>63.5</b></td>
+<td><u>74.0</u></td>
+<td>78.5</td>
+<td><u>36.5</u></td>
+<td><u>52.0</u></td>
+<td><u>59.3</u></td>
+<td><u>59.5</u></td>
+<td><u>8.5</u></td>
+<td><u>23.2</u></td>
+<td><u>31.7</u></td>
+<td>33.0</td>
+<td><u>27.9</u></td>
+<td><u>37.0</u></td>
+<td><u>41.7</u></td>
+<td>44.8</td>
+<td>44.8</td>
+</tr>
+<tr class="">
+<th scope="row">PPO Full</th>
+<td>38.5</td>
+<td>58.6</td>
+<td>71.2</td>
+<td><u>80.0</u></td>
+<td>29.5</td>
+<td>45.6</td>
+<td>51.6</td>
+<td>55.0</td>
+<td>4.2</td>
+<td>19.4</td>
+<td>29.0</td>
+<td><u>33.4</u></td>
+<td>22.4</td>
+<td>30.6</td>
+<td>34.8</td>
+<td>41.0</td>
+<td>40.3</td>
+</tr>
+<tr class="row-mix">
+<th scope="row">PPO BudgetMix</th>
+<td><u>45.5</u></td>
+<td><u>63.1</u></td>
+<td><b>75.1</b></td>
+<td><b>80.3</b></td>
+<td>36.4</td>
+<td>51.6</td>
+<td>55.5</td>
+<td>56.9</td>
+<td><b>10.2</b></td>
+<td><b>24.8</b></td>
+<td><b>32.8</b></td>
+<td><b>34.5</b></td>
+<td>27.0</td>
+<td>35.2</td>
+<td>38.3</td>
+<td>42.7</td>
+<td>44.4</td>
+</tr>
+<tr class="row-gain">
+<th scope="row"><i>Avg. gain</i></th>
+<td>+7.9</td>
+<td>+5.2</td>
+<td>+3.8</td>
+<td>+1.1</td>
+<td>+7.8</td>
+<td>+5.3</td>
+<td>+4.0</td>
+<td>+1.6</td>
+<td>+5.7</td>
+<td>+5.2</td>
+<td>+3.4</td>
+<td>+1.1</td>
+<td>+5.0</td>
+<td>+5.2</td>
+<td>+4.4</td>
+<td>+1.0</td>
+<td>+4.2</td>
+</tr>
+<tr class="model-group"><td colspan="18"><b>Qwen3-8B</b></td></tr>
+<tr class="row-base">
+<th scope="row">Base</th>
+<td>34.0</td>
+<td>49.5</td>
+<td>52.7</td>
+<td>58.5</td>
+<td>42.8</td>
+<td>51.6</td>
+<td>54.6</td>
+<td>56.8</td>
+<td>4.8</td>
+<td>23.2</td>
+<td>29.4</td>
+<td>37.8</td>
+<td>29.8</td>
+<td>34.9</td>
+<td>37.6</td>
+<td>40.8</td>
+<td>39.9</td>
+</tr>
+<tr class="">
+<th scope="row">GRPO Full</th>
+<td>31.9</td>
+<td>58.8</td>
+<td>68.5</td>
+<td>78.0</td>
+<td>31.5</td>
+<td>54.5</td>
+<td>60.8</td>
+<td><u>66.5</u></td>
+<td>3.8</td>
+<td>27.5</td>
+<td>39.0</td>
+<td>45.0</td>
+<td>27.0</td>
+<td><u>40.5</u></td>
+<td><u>45.7</u></td>
+<td><u>49.4</u></td>
+<td>45.5</td>
+</tr>
+<tr class="row-mix">
+<th scope="row">GRPO BudgetMix</th>
+<td>40.8</td>
+<td><u>65.1</u></td>
+<td><u>72.9</u></td>
+<td>79.6</td>
+<td><b>45.5</b></td>
+<td><b>59.8</b></td>
+<td><b>64.6</b></td>
+<td><b>66.8</b></td>
+<td>10.5</td>
+<td><u>33.0</u></td>
+<td><u>43.2</u></td>
+<td>47.2</td>
+<td><b>33.1</b></td>
+<td><b>46.5</b></td>
+<td><b>50.4</b></td>
+<td><b>50.4</b></td>
+<td>50.6</td>
+</tr>
+<tr class="">
+<th scope="row">GiGPO Full</th>
+<td>34.6</td>
+<td>56.5</td>
+<td>65.5</td>
+<td>71.5</td>
+<td>28.7</td>
+<td>48.2</td>
+<td>55.7</td>
+<td>58.7</td>
+<td>5.6</td>
+<td>26.8</td>
+<td>38.8</td>
+<td>43.5</td>
+<td>22.8</td>
+<td>32.9</td>
+<td>36.1</td>
+<td>45.6</td>
+<td>42.0</td>
+</tr>
+<tr class="row-mix">
+<th scope="row">GiGPO BudgetMix</th>
+<td><u>40.9</u></td>
+<td>60.4</td>
+<td>69.1</td>
+<td>72.3</td>
+<td><u>44.9</u></td>
+<td><u>57.8</u></td>
+<td>60.1</td>
+<td>60.7</td>
+<td><u>10.8</u></td>
+<td>30.8</td>
+<td>42.8</td>
+<td>43.2</td>
+<td><u>32.6</u></td>
+<td>39.4</td>
+<td>40.2</td>
+<td>47.7</td>
+<td>47.1</td>
+</tr>
+<tr class="">
+<th scope="row">PPO Full</th>
+<td>40.4</td>
+<td>63.5</td>
+<td>71.2</td>
+<td><u>85.0</u></td>
+<td>34.5</td>
+<td>51.5</td>
+<td>57.0</td>
+<td>64.8</td>
+<td>7.0</td>
+<td>29.5</td>
+<td>41.5</td>
+<td><u>48.0</u></td>
+<td>26.5</td>
+<td>36.0</td>
+<td>40.8</td>
+<td>45.0</td>
+<td>46.4</td>
+</tr>
+<tr class="row-mix">
+<th scope="row">PPO BudgetMix</th>
+<td><b>47.1</b></td>
+<td><b>67.4</b></td>
+<td><b>75.2</b></td>
+<td><b>86.7</b></td>
+<td>44.0</td>
+<td>56.6</td>
+<td><u>61.1</u></td>
+<td>65.9</td>
+<td><b>12.2</b></td>
+<td><b>34.2</b></td>
+<td><b>46.0</b></td>
+<td><b>50.5</b></td>
+<td>32.1</td>
+<td>40.0</td>
+<td>44.5</td>
+<td>46.6</td>
+<td>50.6</td>
+</tr>
+<tr class="row-gain">
+<th scope="row"><i>Avg. gain</i></th>
+<td>+7.3</td>
+<td>+4.7</td>
+<td>+4.0</td>
+<td>+1.4</td>
+<td>+13.2</td>
+<td>+6.7</td>
+<td>+4.1</td>
+<td>+1.1</td>
+<td>+5.7</td>
+<td>+4.7</td>
+<td>+4.2</td>
+<td>+1.5</td>
+<td>+7.2</td>
+<td>+5.5</td>
+<td>+4.2</td>
+<td>+1.6</td>
+<td>+4.8</td>
+</tr>
+</tbody></table></div></div></details><details class="evidence"><summary>BudgetMix training and evaluation protocol <span>§§5.2–5.3</span></summary><div class="details-body"><p>Total and remaining budgets are provided in the prompt. Trajectories that exceed their budget without completion receive zero reward. Evaluation uses 25%, 50%, 75%, and 100% of T<sub>max</sub>.</p></div></details></article>
+</div>
+</section>
+</main>
+<footer>
+<div class="wrap footer-inner">
+<p class="footer-brand"><span class="footer-name">Rethinking Agentic RL</span><span class="footer-question">What does multi-turn RL really improve?</span></p>
+<a href="#top">Back to top ↑</a>
+</div>
+<div class="wrap footer-note">We thank <a href="https://ragen-ai.github.io/" rel="noopener noreferrer" target="_blank">RAGEN</a> and <a href="https://limit-of-rlvr.github.io/" rel="noopener noreferrer" target="_blank">Limit of RLVR</a> for their inspiring project page designs.</div>
+</footer>
+<script src="assets/js/site-config.js"></script>
+<script src="assets/js/paper-figures.js"></script>
+<script src="assets/js/main.js?v=7"></script>
+</body>
+</html>

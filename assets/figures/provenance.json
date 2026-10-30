@@ -1,0 +1,20 @@
+{
+  "paper": "9-26-5422_What_Does_Multi_Turn_Rein.pdf",
+  "paper_sha256": "83d0194bc8df126c8dd1864f80dae837c10f26d1ce81f79164b5bd55853d3933",
+  "archive": "Success_Is_Not_Enough__Rethinking_Multi_Turn_Agentic_Reinforcement_Learning__Copy_ (1).zip",
+  "archive_sha256": "cd88aa2bec34853cf182af3de3e3e83c1aefb178ee7356b515e507f5fc0ae6f4",
+  "note": "Vector artwork from the supplied Overleaf archive; not a raw-data export. Animation changes presentation only.",
+  "figures": {
+    "pass_at_k_grid_4tasks_grpo__red_gray_shaded": "c39e06580195cff064c3029d6acfdda4f311490b63c4ecd736d7e8176e2df52d",
+    "pass_at_t_grid_4tasks__red_gray_shaded": "f826197ee958fdd42acf5116f4fbd1ad4d4e1e4a3bad5c14af012f974687232f",
+    "agent-rl-intro-figure_v6": "14b1b3b1a6b58e4024599a107f31534db1df07ca0885e00e222a43bdb2c20b46",
+    "matched_state_combined__orig_colors": "e805db9158c56aef12f9d845684b9bd288b88c76d83c91d7e3c1e723cfd8b6d6",
+    "error_state_combined__orig_colors": "8862be1748cb0fb59c3faea8d110d2cb3b6b25522831aea6957157f8b810268a",
+    "quality_by_turn_combined__orig_colors": "32dd9148e23259d55e17de7f82fbcadfd95314763d3cda8ded0ff2e8e77f7d16",
+    "figure_07_terminal_local_global_separated_callouts_action_total_nll": "e3b618db58632b746bc1abba2e4fb257483aa279b27a34c4eb15780c1539e061",
+    "training_curves_deepcode__style": "f0a53e5780e38d9d6132890739808e6a2f004f9b7d37c23656f95330aaf24f62",
+    "prm_ablation_frozenlake_bfcl__annotated": "d2aa8d87fb7e331569fbc99132768604521da0f8c8c07b88df776cf13bbf2294",
+    "figure_08_bfcl_with_length_matched_llr": "cab0325bdc3ef611ac1af984522ecd7eac97bc78c19b9790c9b6e1b41b317685",
+    "training_curves_frozenlake__style": "084c242b9ad42bd39e01f96cf4ed2d3ad9cc1a51a92584c2127a56b491292683"
+  }
+}
