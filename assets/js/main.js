@@ -7,7 +7,6 @@
     ["paper-link", config.arxivPdfUrl, (url) => url.hostname === "arxiv.org" && url.pathname.startsWith("/pdf/")],
     ["code-link", config.githubUrl, (url) => url.hostname === "github.com" && url.pathname.split("/").filter(Boolean).length >= 2]
   ];
-  let linked = 0;
   resourceLinks.forEach(([id, value, valid]) => {
     if (!value) return;
     try {
@@ -21,11 +20,8 @@
       link.removeAttribute("aria-describedby");
       link.classList.remove("pending");
       link.querySelector(".link-status")?.remove();
-      linked += 1;
     } catch { /* Missing or invalid release URLs retain their pending state. */ }
   });
-  if (linked === 2) document.getElementById("resource-status").hidden = true;
-  else if (linked === 1) document.getElementById("resource-status").textContent = document.getElementById("paper-link").hasAttribute("href") ? "The code link will be added upon release." : "The arXiv PDF link will be added upon release.";
 
   /* Matched states, error states, and trajectory depth: manual figure carousel. */
   const carousel = document.querySelector(".scatter-carousel");

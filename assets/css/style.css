@@ -273,14 +273,14 @@ h1,h2,.mechanism-part-title,.part-heading h3{text-transform:none}
  .resource-links .button{font-size:14px}
 }
 
-/* Compact affiliations: one row for CAS, one shared row for UCAS and Tsinghua. */
-.affiliations{display:flex;flex-wrap:wrap;justify-content:center;gap:3px 22px;font:400 13px/1.6 "Times New Roman",Times,serif}
+/* Three affiliation lines: two for CAS, one shared by UCAS and Tsinghua. */
+.affiliations{display:flex;flex-wrap:wrap;justify-content:center;gap:3px 22px;font:400 15px/1.6 "Times New Roman",Times,serif}
 .affiliations p{margin:0}
 .affiliations p:first-child{flex-basis:100%}
 .affiliations p+p{margin-top:0}
-.affiliations .institution-line{display:inline}
+.affiliations .institution-line{display:block}
 .affiliations sup{font-family:inherit}
-.author-contacts{font:400 13px/1.6 "Times New Roman",Times,serif;margin-top:10px}
+.author-contacts{font:400 15px/1.6 "Times New Roman",Times,serif;margin-top:10px}
 @media(max-width:640px){.affiliations{gap:4px 16px}.affiliations p{flex-basis:100%}}
 
-@media(min-width:641px) and (max-width:1100px){.affiliations{font-size:12px}}
+@media(max-width:640px){.affiliations,.author-contacts{font-size:14px}}
